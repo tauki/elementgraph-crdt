@@ -74,19 +74,11 @@ func (g *T) FindPath(start *Node, end *Node) []*Node {
 		return path
 	}
 
-	visited := make(map[uuid.UUID]bool)
-	path, _ = g.findPath(start, end, path, visited)
+	path, _ = g.findPath(start, end, path)
 	return path
 }
 
-func (g *T) findPath(start *Node, end *Node, path []*Node, visited map[uuid.UUID]bool) ([]*Node, bool) {
-	// Check if we've already visited this node to prevent cycles
-	if visited[start.ID] {
-		return []*Node{}, false
-	}
-
-	// Mark this node as visited
-	visited[start.ID] = true
+func (g *T) findPath(start *Node, end *Node, path []*Node) ([]*Node, bool) {
 	path = append(path, start)
 
 	if start == end {
@@ -94,13 +86,10 @@ func (g *T) findPath(start *Node, end *Node, path []*Node, visited map[uuid.UUID
 	}
 
 	for _, edge := range start.Edges {
-		newPath, ok := g.findPath(edge.To, end, path, visited)
+		newPath, ok := g.findPath(edge.To, end, path)
 		if ok {
 			return newPath, true
 		}
 	}
-
-	// Unmark this node when backtracking (allows finding alternative paths through this node)
-	visited[start.ID] = false
 	return []*Node{}, false
 }
